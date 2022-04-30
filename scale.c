@@ -19,8 +19,8 @@ double mysecond() {
 int main(int argc, char *argv[]) {
   int **a, **b;
   
-  int M = atoi(argv[1]);
-  int N = atoi(argv[2]);
+  int M = atoi(argv[1]); //inputs
+  int N = atoi(argv[2]); //threads
 
   omp_set_num_threads(N);
 
