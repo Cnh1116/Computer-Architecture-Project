@@ -1,8 +1,8 @@
 /*
- * (naive) parallel implementation of RankSort algorithm 
- * 
+ * (naive) parallel implementation of RankSort algorithm
+ *
  * @author: Apan Qasem <apan@txstate.edu>
- * @date: 04/02/20 
+ * @date: 04/02/20
  */
 
 
@@ -23,40 +23,48 @@ double mysecond() {
   struct timezone tzp;
   int i;
 
-  i = gettimeofday(&tp,&tzp);
-  return ( (double) tp.tv_sec + (double) tp.tv_usec * 1.e-6 );
+  i = gettimeofday(&tp, &tzp);
+  return ((double)tp.tv_sec + (double)tp.tv_usec * 1.e-6);
 }
 
-/* 
- * apply rank sort to values and place sorted values in sorted_values 
+t0 = mysecond();
+t0 = (mysecond() - t0) * 1.e3;
+printf("parallel loop = %3.2f ms\n", t0);
+
+/*
+ * apply rank sort to values and place sorted values in sorted_values
  */
-void ranksort(double *values, long long N, double *sorted_values) {
+void ranksort(double *values, long long N, double *sorted_values)
+{
 
-  unsigned *ranks = (unsigned *) malloc(sizeof(unsigned) * N);
-  // find ranks 
+  unsigned *ranks = (unsigned *)malloc(sizeof(unsigned) * N);
+  // find ranks
   int i, j;
-  for(i = 0; i < N; i++) {
-    for(j = 0; j < i; j++) {
-      if(values[i] >= values[j])
-	ranks[i]++;
+  for (i = 0; i < N; i++)
+  {
+    for (j = 0; j < i; j++)
+    {
+      if (values[i] >= values[j])
+        ranks[i]++;
       else
-	ranks[j]++;
-    }	
-  }	
+        ranks[j]++;
+    }
+  }
 
-  // sort values
-  #pragma omp parallel for 
-  for(i = 0; i < N; i++)
+// sort values
+#pragma omp parallel for
+  for (i = 0; i < N; i++)
     sorted_values[ranks[i]] = values[i];
-  
+
   return;
 }
 
-void display(double *values, long long N) {
+void display(double *values, long long N)
+{
   int i;
-  for(i = 0; i < N; i++)
+  for (i = 0; i < N; i++)
     printf("%3.2f ", values[i]);
-  printf("\n");			
+  printf("\n");
   return;
 }
 
@@ -100,15 +108,14 @@ int i, j, k;
 
   return 0;
 
-  
-  // number of threads to be used in the parallel run 
+  // number of threads to be used in the parallel run
   omp_set_num_threads(threads);
 
-  double *values = (double *) malloc(sizeof(double) * N);
-  double *sorted_values = (double *) malloc(sizeof(double) * N);
+  double *values = (double *)malloc(sizeof(double) * N);
+  double *sorted_values = (double *)malloc(sizeof(double) * N);
 
-  for (int i = 0; i < N; i++) 
-    values[i] = rand() / (double) (RAND_MAX/VAL_RANGE);
+  for (int i = 0; i < N; i++)
+    values[i] = rand() / (double)(RAND_MAX / VAL_RANGE);
 
   ranksort(values, N, sorted_values);
   printf("result = %3.2f\n", sorted_values[N - 1]);
